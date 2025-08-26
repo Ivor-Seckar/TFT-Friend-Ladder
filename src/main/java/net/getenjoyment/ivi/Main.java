@@ -9,7 +9,7 @@ public class Main {
         Summoner mojSummoner = new Summoner("I let her go bro", "BURAZ");
 
         //naredimo dejanski API call in pridobimo nazaj puuid
-        String getPuuidResponse = API_calls.getPUUID(mojSummoner.getGameName(), mojSummoner.getTagLine());
+        String getPuuidResponse = API_Calls.getPUUID(mojSummoner);
         System.out.println(getPuuidResponse);
 
         //iz json odgovora dodamo k mojemu summonerju njegove podatke
@@ -21,7 +21,7 @@ public class Main {
         System.out.println(mojSummoner.getPuuid());
 
         //dejansko pozenemo API call za pridobitev match historyja in ga shranimo v String[]
-        String[] matchHistoryMojegaIgralca = API_calls.getMatchHistory(mojSummoner);
+        String[] matchHistoryMojegaIgralca = API_Calls.getMatchHistory(mojSummoner);
 
         //izpišemo seznam iger
         Methods.izpisiSeznam(matchHistoryMojegaIgralca);

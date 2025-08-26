@@ -2,12 +2,12 @@ package net.getenjoyment.ivi;
 
 public class Summoner {
 
-    //atributi
+    // atributi
     private String gameName;
     private String tagLine;
     private String puuid;
 
-    //konstruktor
+    // konstruktor
     public Summoner(String gameName, String tagLine) {
         this.gameName = gameName;
         this.tagLine = tagLine;
@@ -25,7 +25,6 @@ public class Summoner {
         this.tagLine = tagLine;
     }
 
-    //get in set
     public String getPuuid() {
         return puuid;
     }
