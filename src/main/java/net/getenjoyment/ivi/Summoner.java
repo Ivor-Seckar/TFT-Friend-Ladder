@@ -1,0 +1,45 @@
+package net.getenjoyment.ivi;
+
+public class Summoner {
+
+    //atributi
+    private String gameName;
+    private String tagLine;
+    private String puuid;
+
+    //konstruktor
+    public Summoner(String gameName, String tagLine) {
+        this.gameName = gameName;
+        this.tagLine = tagLine;
+    }
+
+    public Summoner() {
+
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
+
+    public void setTagLine(String tagLine) {
+        this.tagLine = tagLine;
+    }
+
+    //get in set
+    public String getPuuid() {
+        return puuid;
+    }
+
+    public void setPuuid(String puuid) {
+        this.puuid = puuid;
+    }
+
+    public String getTagLine() {
+        return tagLine;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+}
