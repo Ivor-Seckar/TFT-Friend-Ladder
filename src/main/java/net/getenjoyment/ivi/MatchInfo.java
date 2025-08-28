@@ -113,4 +113,11 @@ public class MatchInfo {
     public void setTft_set_number(int tft_set_number) {
         this.tft_set_number = tft_set_number;
     }
+
+    // additional methods
+    public void izpisiParticipants() {
+        for(MatchParticipant participant : participants) {
+            System.out.println(participant.getRiotIdGameName() + " #" + participant.getRiotIdTagline());
+        }
+    }
 }

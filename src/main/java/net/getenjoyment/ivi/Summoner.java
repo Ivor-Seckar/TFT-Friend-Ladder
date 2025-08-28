@@ -1,5 +1,8 @@
 package net.getenjoyment.ivi;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 public class Summoner {
 
     // atributi
@@ -39,6 +42,11 @@ public class Summoner {
 
     public String getGameName() {
         return gameName;
+    }
+
+    // additional methods
+    public String toUrlParams() {
+        return URLEncoder.encode(this.gameName, StandardCharsets.UTF_8).replace("+", "%20") + "/" + URLEncoder.encode(this.tagLine, StandardCharsets.UTF_8);
     }
 
 }

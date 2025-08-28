@@ -2,6 +2,8 @@ package net.getenjoyment.ivi;
 
 import com.google.gson.Gson;
 
+import java.net.http.HttpResponse;
+
 public class Main {
     public static void main (String[] args) throws Exception{
 
@@ -25,6 +27,10 @@ public class Main {
 
         //izpišemo seznam iger
         Methods.izpisiSeznam(matchHistoryMojegaIgralca);
+
+        TFT_Match mojaTftIgra = new TFT_Match();
+        mojaTftIgra = API_Calls.getMatchData("EUW1_7509803998");
+        mojaTftIgra.getInfo().izpisiParticipants();
 
     }
 }

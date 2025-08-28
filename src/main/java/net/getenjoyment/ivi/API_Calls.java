@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 public class API_Calls {
     public static String getPUUID (Summoner igralec) {
-        String url = "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" + Methods.jsonify(igralec.getGameName()) + "/" + Methods.jsonify(igralec.getTagLine());
+        String url = "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" + igralec.toUrlParams();
 
         System.out.println(url);
 
@@ -55,14 +55,11 @@ public class API_Calls {
         MatchHistoryPullConfig matchHistoryPullConfig = new MatchHistoryPullConfig();
 
         // TODO: settamo matchhistory parametre ---------------------------------------------to bo najbrz treba drugje
-        matchHistoryPullConfig.setStartTime("1754006400");
+        matchHistoryPullConfig.setStartTime(1754006400);
+        matchHistoryPullConfig.setCount(4);
 
-        // encodamo matchhistory parametre v url obliko
-        String parametri = URLEncoder.encode(matchHistoryPullConfig.getStartTime(), StandardCharsets.UTF_8);
-        System.out.println(parametri);
-
-        // TODO: NUJNO NAREDITI ENO METODO KI MI GENERIRA URL-JE  !
-        String url = "https://europe.api.riotgames.com/tft/match/v1/matches/by-puuid/" + igralec.getPuuid() + "/ids?startTime=" + parametri;
+        // sestavimo url za API call
+        String url = "https://europe.api.riotgames.com/tft/match/v1/matches/by-puuid/" + igralec.getPuuid() + "/ids" + matchHistoryPullConfig.toUrlParams();
 
         System.out.println(url);
 
@@ -84,17 +81,40 @@ public class API_Calls {
             throw new RuntimeException(e);
         }
 
+        // če igralec nima dosti iger ki ustrezajo kriterijem, RIOT api lahko vrne nazaj [] (prazen seznam). zato preverimo, da se to ni zgodilo.
+        if(!matchHistoryResponse.body().startsWith("[")) {
+            throw new RuntimeException("Nekaj je narobe z API odgovorom pri pridobivanju Match historyja igralca");
+        }
+
         // nov gson da lahko spodaj nas response spremenimo nazaj iz json-a v String[]
         Gson gson = new Gson();
 
         // nas response dejansko spremenimo v list
-        String[] seznamIger = gson.fromJson(matchHistoryResponse.body(), String[].class);
-
-        return seznamIger;
+        return gson.fromJson(matchHistoryResponse.body(), String[].class);
     }
 
-    // TODO: finish this method
-//    public static TFT_Match getMatchData(String match_id) {
-//        String url = "https://europe.api.riotgames.com/tft/match/v1/matches/" +
-//    }
+    // TODO: finish this method + figure out how to efficiently get match_id and input into this method
+    public static TFT_Match getMatchData(String match_id) {
+        String url = "https://europe.api.riotgames.com/tft/match/v1/matches/" + match_id;
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("X-Riot-Token", API_Key.getApiKey())
+                .GET()
+                .build();
+
+        HttpClient httpClient = HttpClient.newHttpClient();
+
+        HttpResponse<String> matchDataResponse;
+
+        try {
+            matchDataResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        Gson gson = new Gson();
+
+        return gson.fromJson(matchDataResponse.body(), TFT_Match.class);
+    }
 }
