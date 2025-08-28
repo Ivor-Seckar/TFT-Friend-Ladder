@@ -2,8 +2,6 @@ package net.getenjoyment.ivi;
 
 import com.google.gson.Gson;
 
-import java.net.http.HttpResponse;
-
 public class Main {
     public static void main (String[] args) throws Exception{
 
