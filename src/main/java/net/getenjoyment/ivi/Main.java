@@ -3,7 +3,7 @@ package net.getenjoyment.ivi;
 import com.google.gson.Gson;
 
 public class Main {
-    public static void main (String[] args) throws Exception{
+    public static void main (String[] args) throws Exception {
 
         //povemo gameName in tagLine da dobimo nazaj puuid
         Summoner mojSummoner = new Summoner("I let her go bro", "BURAZ");
@@ -30,6 +30,7 @@ public class Main {
         mojaTftIgra = API_Calls.getMatchData("EUW1_7509803998");
         mojaTftIgra.getInfo().izpisiParticipants();
 
+        System.out.println(new Gson().toJson(mojaTftIgra));
     }
 }
 
