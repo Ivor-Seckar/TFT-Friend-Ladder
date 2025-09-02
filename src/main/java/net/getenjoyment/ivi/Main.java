@@ -24,13 +24,20 @@ public class Main {
         String[] matchHistoryMojegaIgralca = API_Calls.getMatchHistory(mojSummoner);
 
         //izpišemo seznam iger
-        Methods.izpisiSeznam(matchHistoryMojegaIgralca);
+//        Methods.izpisiSeznam(matchHistoryMojegaIgralca);
 
-        TFT_Match mojaTftIgra = new TFT_Match();
-        mojaTftIgra = API_Calls.getMatchData("EUW1_7509803998");
-        mojaTftIgra.getInfo().izpisiParticipants();
+        TFT_Match[] igreMojegaIgralca = Methods.seznamTftMatchevVClassu(matchHistoryMojegaIgralca);
 
-        System.out.println(new Gson().toJson(mojaTftIgra));
+        TFT_Match zadnjaIgraMojegaIgralca = igreMojegaIgralca[0];   // 0 = latest igra, zadnji element v arrayu = najstarejsa igra
+        zadnjaIgraMojegaIgralca.getInfo().izpisiParticipants();
+        System.out.println(zadnjaIgraMojegaIgralca.getInfo().getGame_length());
+        System.out.println(zadnjaIgraMojegaIgralca.getInfo().getTft_game_type());
+
+//        TFT_Match mojaTftIgra = new TFT_Match();
+//        mojaTftIgra = API_Calls.getMatchData("EUW1_7509803998");
+//        mojaTftIgra.getInfo().izpisiParticipants();
+//
+//        System.out.println(new Gson().toJson(mojaTftIgra));
     }
 }
 

@@ -22,24 +22,31 @@ public class Methods {
 
         long unixDate;
 
-        try {
-            System.out.println("Input the day: ");
-            int day = Integer.parseInt(br.readLine());
+        int day = 1;
+        int month = 8;
+        int year = 2025;
 
-            System.out.println("Input the month: ");
-            int month = Integer.parseInt(br.readLine());
 
-            System.out.println("Input the year: ");
-            int year = Integer.parseInt(br.readLine());
+        LocalDate date = LocalDate.of(year, month, day);
+        Instant instant = date.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
+        unixDate = instant.getEpochSecond();
+        System.out.println(unixDate);
 
-            LocalDate date = LocalDate.of(year, month, day);
-            Instant instant = date.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
-            unixDate = instant.getEpochSecond();
-            System.out.println(unixDate);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            System.out.println("Input the day: ");
+//            int day = Integer.parseInt(br.readLine());
+//
+//            System.out.println("Input the month: ");
+//            int month = Integer.parseInt(br.readLine());
+//
+//            System.out.println("Input the year: ");
+//            int year = Integer.parseInt(br.readLine());
+//
+//        TUKAJ VSTAVI VSE OD UNIXDATE NAPREJ CE ZELIS USER INPUT DATUM ----------------------------------------
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         return unixDate;
     }
