@@ -9,6 +9,7 @@ public class Summoner {
     private String gameName;
     private String tagLine;
     private String puuid;
+    private SummonerStats stats;
 
     // konstruktor
     public Summoner(String gameName, String tagLine) {
@@ -42,6 +43,14 @@ public class Summoner {
 
     public String getGameName() {
         return gameName;
+    }
+
+    public SummonerStats getStats() {
+        return stats;
+    }
+
+    public void setStats(SummonerStats stats) {
+        this.stats = stats;
     }
 
     // additional methods

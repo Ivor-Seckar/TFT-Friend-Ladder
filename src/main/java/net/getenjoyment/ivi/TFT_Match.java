@@ -1,19 +1,19 @@
 package net.getenjoyment.ivi;
 
 public class TFT_Match {
-    private MatchMetadata meta;
+    private MatchMetadata metadata;
     private MatchInfo info;
 
     public TFT_Match() {
 
     }
 
-    public MatchMetadata getMeta() {
-        return meta;
+    public MatchMetadata getMetadata() {
+        return metadata;
     }
 
-    public void setMeta(MatchMetadata meta) {
-        this.meta = meta;
+    public void setMetadata(MatchMetadata metadata) {
+        this.metadata = metadata;
     }
 
     public MatchInfo getInfo() {

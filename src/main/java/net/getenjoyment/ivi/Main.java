@@ -2,6 +2,8 @@ package net.getenjoyment.ivi;
 
 import com.google.gson.Gson;
 
+import java.util.Arrays;
+
 public class Main {
     public static void main (String[] args) throws Exception {
 
@@ -20,24 +22,20 @@ public class Main {
         System.out.println(mojSummoner.getTagLine());
         System.out.println(mojSummoner.getPuuid());
 
-        //dejansko pozenemo API call za pridobitev match historyja in ga shranimo v String[]
-        String[] matchHistoryMojegaIgralca = API_Calls.getMatchHistory(mojSummoner);
+        SummonerStats statiMojegaIgralca = new SummonerStats(mojSummoner);
+        statiMojegaIgralca.setSummonerMatchHistory();
+        statiMojegaIgralca.setWinrate();
 
-        //izpišemo seznam iger
-//        Methods.izpisiSeznam(matchHistoryMojegaIgralca);
+        mojSummoner.setStats(statiMojegaIgralca);
 
-        TFT_Match[] igreMojegaIgralca = Methods.seznamTftMatchevVClassu(matchHistoryMojegaIgralca);
+        System.out.println(statiMojegaIgralca.getWinrate());
 
-        TFT_Match zadnjaIgraMojegaIgralca = igreMojegaIgralca[0];   // 0 = latest igra, zadnji element v arrayu = najstarejsa igra
+        TFT_Match zadnjaIgraMojegaIgralca = statiMojegaIgralca.getMatchHistoryMojegaIgralca()[0];   // 0 = latest igra, zadnji element v arrayu = najstarejsa igra
         zadnjaIgraMojegaIgralca.getInfo().izpisiParticipants();
         System.out.println(zadnjaIgraMojegaIgralca.getInfo().getGame_length());
         System.out.println(zadnjaIgraMojegaIgralca.getInfo().getTft_game_type());
+        System.out.println(Arrays.toString(zadnjaIgraMojegaIgralca.getMetadata().getParticipants()));
 
-//        TFT_Match mojaTftIgra = new TFT_Match();
-//        mojaTftIgra = API_Calls.getMatchData("EUW1_7509803998");
-//        mojaTftIgra.getInfo().izpisiParticipants();
-//
-//        System.out.println(new Gson().toJson(mojaTftIgra));
     }
 }
 
