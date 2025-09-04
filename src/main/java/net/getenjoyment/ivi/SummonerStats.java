@@ -101,7 +101,7 @@ public class SummonerStats {
     }
 
     public String returnLastRound() {
-        return "Total rounds played: " + (int)last_round + "\nStage: " + (int)last_round/6 + ", Round: " + (int)(last_round%6);
+        return "Average total rounds played: " + (int)last_round + "\nStage: " + (int)last_round/6 + ", Round: " + (int)(last_round%6);
     }
 
 }
