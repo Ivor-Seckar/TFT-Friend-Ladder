@@ -5,6 +5,7 @@ public class SummonerStats {
     private TFT_Match[] matchHistoryMojegaIgralca;
     private double winrate;
     private int gold_left;
+    private float last_round;
 
     public SummonerStats(Summoner igralec) {
         this.igralec = igralec;
@@ -32,6 +33,10 @@ public class SummonerStats {
 
     public int getGold_left() {
         return gold_left;
+    }
+
+    public float getLast_round() {
+        return last_round;
     }
 
     // additional methods
@@ -78,4 +83,25 @@ public class SummonerStats {
         }
         this.gold_left = goldLeft/ matchHistoryMojegaIgralca.length;
     }
+
+    public void setAverageLast_Round () {
+        float LastRoundTotal = 0;
+
+        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+
+            String[] playerPuuids = igra.getMetadata().getParticipants();
+            for (int i = 0; i < playerPuuids.length; i++) {
+                if(igralec.getPuuid().equals(playerPuuids[i])) {
+                    float lastRound  = igra.getInfo().getParticipants()[i].getLast_round();
+                    LastRoundTotal += lastRound;
+                }
+            }
+        }
+        this.last_round = LastRoundTotal/ matchHistoryMojegaIgralca.length;
+    }
+
+    public String returnLastRound() {
+        return "Total rounds played: " + (int)last_round + "\nStage: " + (int)last_round/6 + ", Round: " + (int)(last_round%6);
+    }
+
 }

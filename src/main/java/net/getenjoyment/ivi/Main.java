@@ -26,11 +26,13 @@ public class Main {
         statiMojegaIgralca.setSummonerMatchHistory();
         statiMojegaIgralca.setWinrate();
         statiMojegaIgralca.setGold_left();
+        statiMojegaIgralca.setAverageLast_Round();
 
         mojSummoner.setStats(statiMojegaIgralca);
 
         System.out.println(statiMojegaIgralca.getWinrate());
         System.out.println(statiMojegaIgralca.getGold_left());
+        System.out.println(statiMojegaIgralca.returnLastRound());
 
         TFT_Match zadnjaIgraMojegaIgralca = statiMojegaIgralca.getMatchHistoryMojegaIgralca()[0];   // 0 = latest igra, zadnji element v arrayu = najstarejsa igra
         zadnjaIgraMojegaIgralca.getInfo().izpisiParticipants();
