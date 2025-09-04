@@ -25,16 +25,19 @@ public class Main {
         SummonerStats statiMojegaIgralca = new SummonerStats(mojSummoner);
         statiMojegaIgralca.setSummonerMatchHistory();
         statiMojegaIgralca.setWinrate();
+        statiMojegaIgralca.setGold_left();
 
         mojSummoner.setStats(statiMojegaIgralca);
 
         System.out.println(statiMojegaIgralca.getWinrate());
+        System.out.println(statiMojegaIgralca.getGold_left());
 
         TFT_Match zadnjaIgraMojegaIgralca = statiMojegaIgralca.getMatchHistoryMojegaIgralca()[0];   // 0 = latest igra, zadnji element v arrayu = najstarejsa igra
         zadnjaIgraMojegaIgralca.getInfo().izpisiParticipants();
         System.out.println(zadnjaIgraMojegaIgralca.getInfo().getGame_length());
         System.out.println(zadnjaIgraMojegaIgralca.getInfo().getTft_game_type());
         System.out.println(Arrays.toString(zadnjaIgraMojegaIgralca.getMetadata().getParticipants()));
+//        System.out.println(zadnjaIgraMojegaIgralca.getInfo().getGameCreation());
 
     }
 }

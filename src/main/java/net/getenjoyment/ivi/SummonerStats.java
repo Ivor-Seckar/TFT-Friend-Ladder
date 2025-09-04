@@ -4,6 +4,7 @@ public class SummonerStats {
     private Summoner igralec;
     private TFT_Match[] matchHistoryMojegaIgralca;
     private double winrate;
+    private int gold_left;
 
     public SummonerStats(Summoner igralec) {
         this.igralec = igralec;
@@ -29,17 +30,19 @@ public class SummonerStats {
         return winrate;
     }
 
+    public int getGold_left() {
+        return gold_left;
+    }
+
     // additional methods
     public void setSummonerMatchHistory() {
         String[] matchHistoryMojegaIgralcaVStringu = API_Calls.getMatchHistory(igralec);
         this.matchHistoryMojegaIgralca = Methods.seznamTftMatchevVClassu(matchHistoryMojegaIgralcaVStringu);
     }
 
+    // TODO: delete the COUNT after done testing. (unnecessary because we already have matchHistory.length)
     public void setWinrate () {
-        String imeInTagIgralca = igralec.getGameName() + igralec.getTagLine();
-        System.out.println(imeInTagIgralca);
-
-        int count = 0;
+//        int count = 0;
         int winCount = 0;
 
         for(TFT_Match igra : matchHistoryMojegaIgralca) {
@@ -50,12 +53,29 @@ public class SummonerStats {
                     winCount++;
                 }
             }
-            count++;
+//            count++;
         }
 
-        System.out.println(count);
+//        System.out.println(count);
         System.out.println(winCount);
+        System.out.println(matchHistoryMojegaIgralca.length);
 
-        this.winrate = (double) winCount /count;
+        this.winrate = (double) winCount / matchHistoryMojegaIgralca.length;
+    }
+
+    public void setGold_left () {
+        int goldLeft = 0;
+
+        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+
+            String[] playerPuuids = igra.getMetadata().getParticipants();
+            for (int i = 0; i < playerPuuids.length; i++) {
+                if(igralec.getPuuid().equals(playerPuuids[i])) {
+                    int goldLeftInThisGame = igra.getInfo().getParticipants()[i].getGold_left();
+                    goldLeft += goldLeftInThisGame;
+                }
+            }
+        }
+        this.gold_left = goldLeft/ matchHistoryMojegaIgralca.length;
     }
 }

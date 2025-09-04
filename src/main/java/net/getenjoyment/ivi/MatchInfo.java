@@ -5,12 +5,12 @@ public class MatchInfo {
     private long gameCreation;
     private long gameId;
     private long game_datetime;
-    private float game_length;
-    private String game_version;
-    private int mapId;
+    private float game_length; // in seconds
+    private String game_version; // which patch and when it was deployed
+    private int mapId; // Convergence - the TFT map, others are LOL
     private MatchParticipant[] participants;
-    private int queue_id;
-    private String tft_game_type;
+    private int queue_id;  // 1090 - teamfight tactics games, 1100 - Ranked teamfight tactics games, 1110 - TFT tutorial games, 1111 - TFT test games, 1210 - Choncc
+    private String tft_game_type; // standard, pairs, ...
     private String tft_set_core_name;
     private int tft_set_number;
 
