@@ -167,4 +167,8 @@ public class SummonerStats {
         this.players_eliminated = totalEliminations / matchHistoryMojegaIgralca.length;
     }
 
+//    public void favouriteTrait () {
+//        String favouriteTrait =
+//    }
+
 }

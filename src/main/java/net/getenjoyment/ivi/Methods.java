@@ -52,7 +52,6 @@ public class Methods {
     }
 
     // vzame seznam iger v Stringu in pridobi za vsako data in vrne seznam Objektov TFT_Match
-    // TODO: tole metodo treba zbrisat in v api call nardit da mi vrne list matchev in ne string
     public static TFT_Match[] seznamTftMatchevVClassu(String[] seznamMatchStringov) {
 
         TFT_Match[] seznamDejanskihIger = new TFT_Match[seznamMatchStringov.length];
