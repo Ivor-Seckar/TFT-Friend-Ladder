@@ -6,6 +6,9 @@ public class SummonerStats {
     private double winrate;
     private int gold_left;
     private float last_round;
+    private int total_damage_to_players;
+    private float placement;
+    private int players_eliminated;
 
     public SummonerStats(Summoner igralec) {
         this.igralec = igralec;
@@ -37,6 +40,18 @@ public class SummonerStats {
 
     public float getLast_round() {
         return last_round;
+    }
+
+    public int getTotal_damage_to_players() {
+        return total_damage_to_players;
+    }
+
+    public float getPlacement() {
+        return placement;
+    }
+
+    public int getPlayers_eliminated() {
+        return players_eliminated;
     }
 
     // additional methods
@@ -102,6 +117,54 @@ public class SummonerStats {
 
     public String returnLastRound() {
         return "Average total rounds played: " + (int)last_round + "\nStage: " + (int)last_round/6 + ", Round: " + (int)(last_round%6);
+    }
+
+    public void setAverageTotal_damage_to_players () {
+        int totalDamage = 0;
+
+        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+
+            String[] playerPuuids = igra.getMetadata().getParticipants();
+            for (int i = 0; i < playerPuuids.length; i++) {
+                if(igralec.getPuuid().equals(playerPuuids[i])) {
+                    int damageThisGame = igra.getInfo().getParticipants()[i].getTotal_damage_to_players();
+                    totalDamage += damageThisGame;
+                }
+            }
+        }
+        this.total_damage_to_players = totalDamage/ matchHistoryMojegaIgralca.length;
+    }
+
+    public void setAveragePlacement () {
+        float totalPlacement = 0;
+
+        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+
+            String[] playerPuuids = igra.getMetadata().getParticipants();
+            for (int i = 0; i < playerPuuids.length; i++) {
+                if(igralec.getPuuid().equals(playerPuuids[i])) {
+                    int placementThisGame = igra.getInfo().getParticipants()[i].getPlacement();
+                    totalPlacement += placementThisGame;
+                }
+            }
+        }
+        this.placement = totalPlacement / matchHistoryMojegaIgralca.length;
+    }
+
+    public void setAveragePlayersEliminated () {
+        int totalEliminations = 0;
+
+        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+
+            String[] playerPuuids = igra.getMetadata().getParticipants();
+            for (int i = 0; i < playerPuuids.length; i++) {
+                if(igralec.getPuuid().equals(playerPuuids[i])) {
+                    int eliminationsThisGame = igra.getInfo().getParticipants()[i].getPlayers_eliminated();
+                    totalEliminations += eliminationsThisGame;
+                }
+            }
+        }
+        this.players_eliminated = totalEliminations / matchHistoryMojegaIgralca.length;
     }
 
 }
