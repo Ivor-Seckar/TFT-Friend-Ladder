@@ -168,7 +168,7 @@ public class SummonerStats {
     }
 
 //    public void favouriteTrait () {
-//        String favouriteTrait =
+//        String favouriteTrait;
 //    }
 
 }
