@@ -14,6 +14,8 @@ public class SummonerStats {
     private int players_eliminated;
     private String favourite_trait;
     private int favourite_trait_times_played;
+    private String favourite_unit;
+    private int favourite_unit_times_played;
 
     public SummonerStats(Summoner igralec) {
         this.igralec = igralec;
@@ -65,6 +67,14 @@ public class SummonerStats {
 
     public int getFavourite_trait_times_played() {
         return favourite_trait_times_played;
+    }
+
+    public String getFavourite_unit() {
+        return favourite_unit;
+    }
+
+    public int getFavourite_unit_times_played() {
+        return favourite_unit_times_played;
     }
 
     // additional methods
@@ -220,6 +230,44 @@ public class SummonerStats {
 
     public String returnFavourite_trait() {
         return "Favourite trait: " + favourite_trait + "\nThat trait was played \033[1m" + favourite_trait_times_played + "\033[0m times in" + matchHistoryMojegaIgralca.length + " games.";
+    }
+
+    public void setFavourite_unit() {
+        HashMap<String, Integer> mojiUniti = new HashMap<>();
+
+        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+
+            MatchParticipant[] mojiIgralci = igra.getInfo().getParticipants();
+            for(MatchParticipant participant : mojiIgralci) {
+                if(igralec.getPuuid().equals(participant.getPuuid())) {
+                    Unit[] units = participant.getUnits();
+
+                    for(Unit singleUnit : units) {
+                        String singleUnitName = singleUnit.getCharacter_id();
+                        if(mojiUniti.containsKey(singleUnitName)) {
+                            mojiUniti.put(singleUnitName, mojiUniti.get(singleUnitName) + 1);
+                        } else {
+                            mojiUniti.put(singleUnitName, 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        String favUnit = null;
+        int favUnitTimesPlayed = 0;
+
+        for(Map.Entry<String, Integer> element : mojiUniti.entrySet()) {
+            if(element.getValue() > favUnitTimesPlayed) {
+                favUnitTimesPlayed = element.getValue();
+                favUnit = element.getKey();
+            }
+        }
+
+        if(favUnitTimesPlayed != 0) {
+            this.favourite_unit = favUnit;
+            this.favourite_unit_times_played = favUnitTimesPlayed;
+        }
     }
 
 }
