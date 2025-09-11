@@ -1,5 +1,8 @@
 package net.getenjoyment.ivi;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SummonerStats {
     private Summoner igralec;
     private TFT_Match[] matchHistoryMojegaIgralca;
@@ -9,6 +12,8 @@ public class SummonerStats {
     private int total_damage_to_players;
     private float placement;
     private int players_eliminated;
+    private String favourite_trait;
+    private int favourite_trait_times_played;
 
     public SummonerStats(Summoner igralec) {
         this.igralec = igralec;
@@ -52,6 +57,14 @@ public class SummonerStats {
 
     public int getPlayers_eliminated() {
         return players_eliminated;
+    }
+
+    public String getFavourite_trait() {
+        return favourite_trait;
+    }
+
+    public int getFavourite_trait_times_played() {
+        return favourite_trait_times_played;
     }
 
     // additional methods
@@ -167,8 +180,46 @@ public class SummonerStats {
         this.players_eliminated = totalEliminations / matchHistoryMojegaIgralca.length;
     }
 
-//    public void favouriteTrait () {
-//        String favouriteTrait;
-//    }
+    // TODO: add support for trait style and trait tier
+    public void setFavourite_trait() {
+        HashMap<String, Integer> mojiTraiti = new HashMap<>();
+
+        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+
+            MatchParticipant[] mojiIgralci = igra.getInfo().getParticipants();
+            for(MatchParticipant participant : mojiIgralci) {
+                if(igralec.getPuuid().equals(participant.getPuuid())) {
+                    Trait[] traits = participant.getTraits();
+
+                    for(Trait singleTrait : traits) {
+                        if(mojiTraiti.containsKey(singleTrait.getName())) {
+                            mojiTraiti.put(singleTrait.getName(), mojiTraiti.get(singleTrait.getName()) + 1);
+                        } else {
+                            mojiTraiti.put(singleTrait.getName(), 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        String favTrait = null;
+        int favTraitTimesPlayed = 0;
+
+        for(Map.Entry<String, Integer> element : mojiTraiti.entrySet()) {
+            if(element.getValue() > favTraitTimesPlayed) {
+                favTraitTimesPlayed = element.getValue();
+                favTrait = element.getKey();
+            }
+        }
+
+        if(favTraitTimesPlayed != 0) {
+            this.favourite_trait = favTrait;
+            this.favourite_trait_times_played = favTraitTimesPlayed;
+        }
+    }
+
+    public String returnFavourite_trait() {
+        return "Favourite trait: " + favourite_trait + "\nThat trait was played \033[1m" + favourite_trait_times_played + "\033[0m times in" + matchHistoryMojegaIgralca.length + " games.";
+    }
 
 }
