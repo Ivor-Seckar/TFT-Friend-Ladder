@@ -270,4 +270,6 @@ public class SummonerStats {
         }
     }
 
+//    public void progress
+
 }
