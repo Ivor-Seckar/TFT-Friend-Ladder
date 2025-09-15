@@ -13,7 +13,9 @@ public class SummonerStats {
     private float placement;
     private int players_eliminated;
     private String favourite_trait;
+    private String favourite_silver_plus_trait;
     private int favourite_trait_times_played;
+    private int favourite_silver_plus_trait_times_played;
     private String favourite_unit;
     private int favourite_unit_times_played;
 
@@ -77,15 +79,21 @@ public class SummonerStats {
         return favourite_unit_times_played;
     }
 
+    public String getFavourite_silver_plus_trait() {
+        return favourite_silver_plus_trait;
+    }
+
+    public int getFavourite_silver_plus_trait_times_played() {
+        return favourite_silver_plus_trait_times_played;
+    }
+
     // additional methods
     public void setSummonerMatchHistory() {
         String[] matchHistoryMojegaIgralcaVStringu = API_Calls.getMatchHistory(igralec);
         this.matchHistoryMojegaIgralca = Methods.seznamTftMatchevVClassu(matchHistoryMojegaIgralcaVStringu);
     }
 
-    // TODO: delete the COUNT after done testing. (unnecessary because we already have matchHistory.length)
     public void setWinrate () {
-//        int count = 0;
         int winCount = 0;
 
         for(TFT_Match igra : matchHistoryMojegaIgralca) {
@@ -96,10 +104,8 @@ public class SummonerStats {
                     winCount++;
                 }
             }
-//            count++;
         }
 
-//        System.out.println(count);
         System.out.println(winCount);
         System.out.println(matchHistoryMojegaIgralca.length);
 
@@ -119,7 +125,7 @@ public class SummonerStats {
                 }
             }
         }
-        this.gold_left = goldLeft/ matchHistoryMojegaIgralca.length;
+        this.gold_left = (int) Math.round((double)goldLeft/ matchHistoryMojegaIgralca.length);
     }
 
     public void setAverageLast_Round () {
@@ -139,7 +145,14 @@ public class SummonerStats {
     }
 
     public String returnLastRound() {
-        return "Average total rounds played: " + (int)last_round + "\nStage: " + (int)last_round/6 + ", Round: " + (int)(last_round%6);
+        // ker riot drugače šteje stage itd. stage 1 je 1 in ne 0. runde 31-36 so stage 6 npr.
+        int avgRound = Math.round(last_round);
+        int stage = (avgRound - 1) / 6 + 1;
+        int round = (avgRound - 1) % 6 + 1;
+
+        return "Average total rounds played: " + (int)last_round
+                + "\nStage: " + stage
+                + ", Round: " + round;
     }
 
     public void setAverageTotal_damage_to_players () {
@@ -155,7 +168,7 @@ public class SummonerStats {
                 }
             }
         }
-        this.total_damage_to_players = totalDamage/ matchHistoryMojegaIgralca.length;
+        this.total_damage_to_players = (int) Math.round((double)totalDamage/ matchHistoryMojegaIgralca.length);
     }
 
     public void setAveragePlacement () {
@@ -190,7 +203,6 @@ public class SummonerStats {
         this.players_eliminated = totalEliminations / matchHistoryMojegaIgralca.length;
     }
 
-    // TODO: add support for trait style and trait tier
     public void setFavourite_trait() {
         HashMap<String, Integer> mojiTraiti = new HashMap<>();
 
@@ -202,10 +214,12 @@ public class SummonerStats {
                     Trait[] traits = participant.getTraits();
 
                     for(Trait singleTrait : traits) {
-                        if(mojiTraiti.containsKey(singleTrait.getName())) {
-                            mojiTraiti.put(singleTrait.getName(), mojiTraiti.get(singleTrait.getName()) + 1);
-                        } else {
-                            mojiTraiti.put(singleTrait.getName(), 1);
+                        String hashMapKey = singleTrait.getName() + ":" + singleTrait.getStyle();
+
+                        if(singleTrait.getStyle() != 0 && singleTrait.getNum_units() > 1 && mojiTraiti.containsKey(hashMapKey)) {
+                            mojiTraiti.put(hashMapKey, mojiTraiti.get(hashMapKey) + 1);
+                        } else if (singleTrait.getStyle() != 0 && singleTrait.getNum_units() > 1) {
+                            mojiTraiti.put(hashMapKey, 1);
                         }
                     }
                 }
@@ -226,10 +240,34 @@ public class SummonerStats {
             this.favourite_trait = favTrait;
             this.favourite_trait_times_played = favTraitTimesPlayed;
         }
+//---------------------------------------------------------------------------------
+        String favTraitSilverPlus = null;
+        int favTraitSilverPlusTimesPlayed = 0;
+
+        for(Map.Entry<String, Integer> element : mojiTraiti.entrySet()) {
+
+            String traitName = element.getKey();
+            int traitStyle = Integer.parseInt(traitName.substring(traitName.indexOf(":") + 1));
+
+            if(traitStyle > 1 && element.getValue() > favTraitSilverPlusTimesPlayed) {
+                favTraitSilverPlusTimesPlayed = element.getValue();
+                favTraitSilverPlus = element.getKey();
+            }
+        }
+
+        if(favTraitSilverPlusTimesPlayed != 0) {
+            this.favourite_silver_plus_trait = favTraitSilverPlus;
+            this.favourite_silver_plus_trait_times_played = favTraitSilverPlusTimesPlayed;
+        }
     }
 
     public String returnFavourite_trait() {
-        return "Favourite trait: " + favourite_trait + "\nThat trait was played \033[1m" + favourite_trait_times_played + "\033[0m times in" + matchHistoryMojegaIgralca.length + " games.";
+        return "Favourite trait: " + favourite_trait
+                + "\nThat trait was played \033[1m" + favourite_trait_times_played
+                + "\033[0m times in " + matchHistoryMojegaIgralca.length + "\sgames."
+                + "\nFavourite trait (silver plus): " + favourite_silver_plus_trait
+                + "\nThat trait was played \033[1m" + favourite_silver_plus_trait_times_played
+                + "\033[0m times in " + matchHistoryMojegaIgralca.length + "\sgames.";
     }
 
     public void setFavourite_unit() {
@@ -269,6 +307,7 @@ public class SummonerStats {
             this.favourite_unit_times_played = favUnitTimesPlayed;
         }
     }
+// TODO: separate double up, normal and ranked.
 
 //    public void progress
 

@@ -5,7 +5,7 @@ public class Trait {
     private int num_units;
     private int style;  // (0 = No style, 1 = Bronze, 2 = Silver, 3 = Gold, 4 = Chromatic)
     private int tier_current;
-    private int tier_total;
+    private int tier_total; // Max tier (wraith 2/4/6 - tiers 1/2/3, mentors 1/4 - tiers 1/3, star guardians 1/2/3/4/5/6/7... - tiers 1 - 12
 
     public Trait() {
 

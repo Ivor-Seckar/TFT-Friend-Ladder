@@ -1,9 +1,5 @@
 package net.getenjoyment.ivi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 public class MatchHistoryPullConfig {
     // atributi
     private int start;  // how far into the list of matches do i want the api to start fetching --> 0 = latest match, 1 = 2nd latest match...
@@ -51,7 +47,7 @@ public class MatchHistoryPullConfig {
 
     // additional methods
     // choosing match history pull parametres - 1 (startTime), 2 - (endTime)
-    public static void setParameters (MatchHistoryPullConfig matchHistoryPullConfig, int izbira, long unixDate) {
+    public static void setParameters(MatchHistoryPullConfig matchHistoryPullConfig, int izbira, long unixDate) {
         if(izbira == 1) {
             matchHistoryPullConfig.setStartTime(unixDate);
         } else if (izbira == 2) {
