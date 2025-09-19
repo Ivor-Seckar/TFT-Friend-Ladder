@@ -35,10 +35,6 @@ public class SummonerStats {
         return matchHistoryMojegaIgralca;
     }
 
-    public void setMatchHistoryMojegaIgralca(TFT_Match[] matchHistoryMojegaIgralca) {
-        this.matchHistoryMojegaIgralca = matchHistoryMojegaIgralca;
-    }
-
     public double getWinrate() {
         return winrate;
     }
@@ -90,7 +86,25 @@ public class SummonerStats {
     // additional methods
     public void setSummonerMatchHistory() {
         String[] matchHistoryMojegaIgralcaVStringu = API_Calls.getMatchHistory(igralec);
-        this.matchHistoryMojegaIgralca = Methods.seznamTftMatchevVClassu(matchHistoryMojegaIgralcaVStringu);
+
+        TFT_Match[] seznamDejanskihIger = new TFT_Match[matchHistoryMojegaIgralcaVStringu.length];
+
+        for (int i = 0; i < matchHistoryMojegaIgralcaVStringu.length; i++) {
+            TFT_Match dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
+            seznamDejanskihIger[i] = dejanskaIgra;
+            if(i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
+                try {
+                    System.out.println("..........Pausing the execution for 2 minutes to prevent exceeding API rate limits..........");
+                    Thread.sleep(120000);  // 120 000 milliseconds - 120 seconds - 2 minutes.
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.out.println("Thread has been interrupted while fetching match data.");
+                    return;
+                }
+            }
+        }
+
+        this.matchHistoryMojegaIgralca = seznamDejanskihIger;
     }
 
     public void setWinrate () {
@@ -145,10 +159,21 @@ public class SummonerStats {
     }
 
     public String returnLastRound() {
-        // ker riot drugače šteje stage itd. stage 1 je 1 in ne 0. runde 31-36 so stage 6 npr.
         int avgRound = Math.round(last_round);
-        int stage = (avgRound - 1) / 6 + 1;
-        int round = (avgRound - 1) % 6 + 1;
+        int stage, round;
+
+        if (avgRound <= 3) {
+            // Still in stage 1
+            stage = 1;
+            round = avgRound;
+        } else {
+            // Subtract the 3 stage-1 rounds
+            int afterCreeps = avgRound - 3;
+
+            // Each stage after 1 has 7 rounds
+            stage = 2 + (afterCreeps - 1) / 7;
+            round = ((afterCreeps - 1) % 7) + 1;
+        }
 
         return "Average total rounds played: " + (int)last_round
                 + "\nStage: " + stage
@@ -308,6 +333,8 @@ public class SummonerStats {
         }
     }
 // TODO: separate double up, normal and ranked.
+
+// TODO: paginate match history and limit api calls so it doesn't exceed the rate
 
 //    public void progress
 

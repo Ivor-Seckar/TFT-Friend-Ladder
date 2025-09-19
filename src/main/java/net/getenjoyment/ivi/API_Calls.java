@@ -54,7 +54,7 @@ public class API_Calls {
 
         // TODO: settamo matchhistory parametre ---------------------------------------------to bo najbrz treba drugje
         MatchHistoryPullConfig.setParameters(matchHistoryPullConfig, 1, Methods.dateToUnix());
-        matchHistoryPullConfig.setCount(80);
+        matchHistoryPullConfig.setCount(100);
 
         // sestavimo url za API call
         String url = "https://europe.api.riotgames.com/tft/match/v1/matches/by-puuid/" + igralec.getPuuid() + "/ids" + matchHistoryPullConfig.toUrlParams();
