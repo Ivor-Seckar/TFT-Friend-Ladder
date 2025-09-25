@@ -25,7 +25,7 @@ public class Main {
         System.out.println(mojSummoner.getPuuid());
 
         SummonerStats statiMojegaIgralca = new SummonerStats(mojSummoner);
-        statiMojegaIgralca.setSummonerMatchHistory();
+        statiMojegaIgralca.setSummonerMatchHistory(15);
         statiMojegaIgralca.setWinrate();
         statiMojegaIgralca.setGold_left();
         statiMojegaIgralca.setAverageLast_Round();

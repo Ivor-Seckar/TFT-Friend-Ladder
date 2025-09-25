@@ -1,5 +1,6 @@
 package net.getenjoyment.ivi;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,15 +85,18 @@ public class SummonerStats {
     }
 
     // additional methods
-    public void setSummonerMatchHistory() {
+    public void setSummonerMatchHistory(int setNumber) {
         String[] matchHistoryMojegaIgralcaVStringu = API_Calls.getMatchHistory(igralec);
 
         TFT_Match[] seznamDejanskihIger = new TFT_Match[matchHistoryMojegaIgralcaVStringu.length];
 
-        for (int i = 0; i < matchHistoryMojegaIgralcaVStringu.length; i++) {
+        int i;
+        for (i = 0; i < matchHistoryMojegaIgralcaVStringu.length; i++) {
             TFT_Match dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
+            if(dejanskaIgra.getInfo().getTft_set_number() != setNumber) break;
             seznamDejanskihIger[i] = dejanskaIgra;
-            if(i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
+
+            if(i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
                 try {
                     System.out.println("..........Pausing the execution for 2 minutes to prevent exceeding API rate limits..........");
                     Thread.sleep(120000);  // 120 000 milliseconds - 120 seconds - 2 minutes.
@@ -104,7 +108,7 @@ public class SummonerStats {
             }
         }
 
-        this.matchHistoryMojegaIgralca = seznamDejanskihIger;
+        this.matchHistoryMojegaIgralca = Arrays.copyOf(seznamDejanskihIger, i); // there could be less than 100 viable games, so we only copy the NON-null entries to our actual match history (as the seznamDejanskihIger would be 100 long even if it only had 3 viable games and the rest nulls)
     }
 
     public void setWinrate () {
@@ -142,6 +146,8 @@ public class SummonerStats {
         this.gold_left = (int) Math.round((double)goldLeft/ matchHistoryMojegaIgralca.length);
     }
 
+
+    // TODO: check the last round calculation, might be off
     public void setAverageLast_Round () {
         float LastRoundTotal = 0;
 
