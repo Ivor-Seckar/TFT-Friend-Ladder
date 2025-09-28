@@ -47,13 +47,13 @@ public class MatchHistoryPullConfig {
 
     // additional methods
     // choosing match history pull parametres - 1 (startTime), 2 - (endTime)
-    public static void setParameters(MatchHistoryPullConfig matchHistoryPullConfig, int izbira, long unixDate) {
-        if(izbira == 1) {
-            matchHistoryPullConfig.setStartTime(unixDate);
-        } else if (izbira == 2) {
-            matchHistoryPullConfig.setEndTime(unixDate);
-        }
-    }
+//    public static void setParameters(MatchHistoryPullConfig matchHistoryPullConfig, int izbira, long unixDate) {
+//        if(izbira == 1) {
+//            matchHistoryPullConfig.setStartTime(unixDate);
+//        } else if (izbira == 2) {
+//            matchHistoryPullConfig.setEndTime(unixDate);
+//        }
+//    }
 
     public String toUrlParams(){
         StringBuilder mojUrl = new StringBuilder();

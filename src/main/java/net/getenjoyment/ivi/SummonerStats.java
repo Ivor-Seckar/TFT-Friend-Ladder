@@ -1,17 +1,18 @@
 package net.getenjoyment.ivi;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SummonerStats {
     private Summoner igralec;
-    private TFT_Match[] matchHistoryMojegaIgralca;
+    private ArrayList<TFT_Match> matchHistoryMojegaIgralca;
     private double winrate;
     private int gold_left;
-    private float last_round;
+    private double last_round;
     private int total_damage_to_players;
-    private float placement;
+    private double placement;
     private int players_eliminated;
     private String favourite_trait;
     private String favourite_silver_plus_trait;
@@ -32,7 +33,7 @@ public class SummonerStats {
         this.igralec = igralec;
     }
 
-    public TFT_Match[] getMatchHistoryMojegaIgralca() {
+    public ArrayList<TFT_Match> getMatchHistoryMojegaIgralca() {
         return matchHistoryMojegaIgralca;
     }
 
@@ -44,7 +45,7 @@ public class SummonerStats {
         return gold_left;
     }
 
-    public float getLast_round() {
+    public double getLast_round() {
         return last_round;
     }
 
@@ -52,7 +53,7 @@ public class SummonerStats {
         return total_damage_to_players;
     }
 
-    public float getPlacement() {
+    public double getPlacement() {
         return placement;
     }
 
@@ -86,29 +87,62 @@ public class SummonerStats {
 
     // additional methods
     public void setSummonerMatchHistory(int setNumber) {
-        String[] matchHistoryMojegaIgralcaVStringu = API_Calls.getMatchHistory(igralec);
+        ArrayList<TFT_Match> matchHistoryMojegaIgralca = new ArrayList<>();
 
-        TFT_Match[] seznamDejanskihIger = new TFT_Match[matchHistoryMojegaIgralcaVStringu.length];
+        int start = 0;
+        boolean continueFetching = true;
 
-        int i;
-        for (i = 0; i < matchHistoryMojegaIgralcaVStringu.length; i++) {
-            TFT_Match dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
-            if(dejanskaIgra.getInfo().getTft_set_number() != setNumber) break;
-            seznamDejanskihIger[i] = dejanskaIgra;
+        while(continueFetching) {
+            String[] matchHistoryMojegaIgralcaVStringu = null;
 
-            if(i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
+            try {
+                matchHistoryMojegaIgralcaVStringu = API_Calls.getMatchHistory(igralec, 100, start);
+
+                if (matchHistoryMojegaIgralcaVStringu.length == 0) {  // Could be end of history or temporary API empty response
+                    Thread.sleep(10_000);
+                    continue;
+                }
+
+                for (int i = 0; i < matchHistoryMojegaIgralcaVStringu.length; i++) {
+                    TFT_Match dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
+                    int failCount = 0;
+
+                    while ((dejanskaIgra == null || dejanskaIgra.getInfo() == null) && failCount < 6) {
+                        System.out.println("Retrying match " + matchHistoryMojegaIgralcaVStringu[i] + " because info is null.");
+                        Thread.sleep(15_000);
+                        dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
+                        failCount++;
+                    }
+                    if (dejanskaIgra == null || dejanskaIgra.getInfo() == null){
+                        System.out.println("Skipping match " + matchHistoryMojegaIgralcaVStringu[i] + " because info is null.");
+                        continue;
+                    }
+
+                    if (dejanskaIgra.getInfo().getTft_set_number() != setNumber) {
+                        continueFetching = false;
+                        break;
+                    }
+                    matchHistoryMojegaIgralca.add(dejanskaIgra);
+
+                    if (i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
+                        System.out.println("...Pausing 2 minutes to respect API rate limits...");
+                        Thread.sleep(120_000);
+                    }
+                }
+                start += matchHistoryMojegaIgralcaVStringu.length;
+
+            } catch (Exception e) {
+                System.out.println("Rate limit hit. Waiting 2 minutes before retrying...");
                 try {
-                    System.out.println("..........Pausing the execution for 2 minutes to prevent exceeding API rate limits..........");
-                    Thread.sleep(120000);  // 120 000 milliseconds - 120 seconds - 2 minutes.
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    System.out.println("Thread has been interrupted while fetching match data.");
-                    return;
+                    Thread.sleep(120_000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt(); // preserve interrupt status
+                    throw new RuntimeException(ie);
                 }
             }
         }
 
-        this.matchHistoryMojegaIgralca = Arrays.copyOf(seznamDejanskihIger, i); // there could be less than 100 viable games, so we only copy the NON-null entries to our actual match history (as the seznamDejanskihIger would be 100 long even if it only had 3 viable games and the rest nulls)
+        this.matchHistoryMojegaIgralca = matchHistoryMojegaIgralca;
     }
 
     public void setWinrate () {
@@ -125,9 +159,9 @@ public class SummonerStats {
         }
 
         System.out.println(winCount);
-        System.out.println(matchHistoryMojegaIgralca.length);
+        System.out.println(matchHistoryMojegaIgralca.size());
 
-        this.winrate = (double) winCount / matchHistoryMojegaIgralca.length;
+        this.winrate = (double) winCount / matchHistoryMojegaIgralca.size();
     }
 
     public void setGold_left () {
@@ -143,29 +177,27 @@ public class SummonerStats {
                 }
             }
         }
-        this.gold_left = (int) Math.round((double)goldLeft/ matchHistoryMojegaIgralca.length);
+        this.gold_left = (int) Math.round((double)goldLeft/ matchHistoryMojegaIgralca.size());
     }
 
-
-    // TODO: check the last round calculation, might be off
     public void setAverageLast_Round () {
-        float LastRoundTotal = 0;
+        double LastRoundTotal = 0;
 
         for(TFT_Match igra : matchHistoryMojegaIgralca) {
 
             String[] playerPuuids = igra.getMetadata().getParticipants();
             for (int i = 0; i < playerPuuids.length; i++) {
                 if(igralec.getPuuid().equals(playerPuuids[i])) {
-                    float lastRound  = igra.getInfo().getParticipants()[i].getLast_round();
+                    double lastRound  = igra.getInfo().getParticipants()[i].getLast_round();
                     LastRoundTotal += lastRound;
                 }
             }
         }
-        this.last_round = LastRoundTotal/ matchHistoryMojegaIgralca.length;
+        this.last_round = LastRoundTotal/ matchHistoryMojegaIgralca.size();
     }
 
     public String returnLastRound() {
-        int avgRound = Math.round(last_round);
+        int avgRound = (int) Math.floor(last_round); // math.floor for it to round down, Math.round for it to round accurately (even if upwards)
         int stage, round;
 
         if (avgRound <= 3) {
@@ -199,7 +231,7 @@ public class SummonerStats {
                 }
             }
         }
-        this.total_damage_to_players = (int) Math.round((double)totalDamage/ matchHistoryMojegaIgralca.length);
+        this.total_damage_to_players = (int) Math.round((double)totalDamage/ matchHistoryMojegaIgralca.size());
     }
 
     public void setAveragePlacement () {
@@ -215,7 +247,7 @@ public class SummonerStats {
                 }
             }
         }
-        this.placement = totalPlacement / matchHistoryMojegaIgralca.length;
+        this.placement = totalPlacement / matchHistoryMojegaIgralca.size();
     }
 
     public void setAveragePlayersEliminated () {
@@ -231,7 +263,7 @@ public class SummonerStats {
                 }
             }
         }
-        this.players_eliminated = totalEliminations / matchHistoryMojegaIgralca.length;
+        this.players_eliminated = totalEliminations / matchHistoryMojegaIgralca.size();
     }
 
     public void setFavourite_trait() {
@@ -295,10 +327,10 @@ public class SummonerStats {
     public String returnFavourite_trait() {
         return "Favourite trait: " + favourite_trait
                 + "\nThat trait was played \033[1m" + favourite_trait_times_played
-                + "\033[0m times in " + matchHistoryMojegaIgralca.length + "\sgames."
+                + "\033[0m times in " + matchHistoryMojegaIgralca.size() + "\sgames."
                 + "\nFavourite trait (silver plus): " + favourite_silver_plus_trait
                 + "\nThat trait was played \033[1m" + favourite_silver_plus_trait_times_played
-                + "\033[0m times in " + matchHistoryMojegaIgralca.length + "\sgames.";
+                + "\033[0m times in " + matchHistoryMojegaIgralca.size() + "\sgames.";
     }
 
     public void setFavourite_unit() {

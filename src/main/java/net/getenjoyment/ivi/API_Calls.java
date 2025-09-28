@@ -47,14 +47,15 @@ public class API_Calls {
         return String.valueOf(nameResponse.body());
     }
 
-    public static String[] getMatchHistory(Summoner igralec) {
+    public static String[] getMatchHistory(Summoner igralec, int count, Long endTime, Long startTime, Integer start) {
 
         // naredimo nov match history za nasega igralca, s katerim bomo manipulirali
         MatchHistoryPullConfig matchHistoryPullConfig = new MatchHistoryPullConfig();
 
-        // TODO: settamo matchhistory parametre ---------------------------------------------to bo najbrz treba drugje
-        MatchHistoryPullConfig.setParameters(matchHistoryPullConfig, 1, Methods.dateToUnix());
-        matchHistoryPullConfig.setCount(100);
+        if(start != null) matchHistoryPullConfig.setStart(start);
+        if(endTime != null) matchHistoryPullConfig.setEndTime(endTime);
+        if(startTime != null) matchHistoryPullConfig.setStartTime(startTime);
+        matchHistoryPullConfig.setCount(count);
 
         // sestavimo url za API call
         String url = "https://europe.api.riotgames.com/tft/match/v1/matches/by-puuid/" + igralec.getPuuid() + "/ids" + matchHistoryPullConfig.toUrlParams();
@@ -91,7 +92,19 @@ public class API_Calls {
         return gson.fromJson(matchHistoryResponse.body(), String[].class);
     }
 
-    // TODO: figure out how to efficiently get match_id and input into this method
+    // overloading so that i can have optional arguments.
+    public static String[] getMatchHistory(Summoner igralec) {
+        return getMatchHistory(igralec, 100, null, null, null);
+    }
+
+    public static String[] getMatchHistory(Summoner igralec, int count) {
+        return getMatchHistory(igralec, count, null, null, null);
+    }
+
+    public static String[] getMatchHistory(Summoner igralec, int count, Integer start) {
+        return getMatchHistory(igralec, count, null, null, start);
+    }
+
     public static TFT_Match getMatchData(String match_id) {
         String url = "https://europe.api.riotgames.com/tft/match/v1/matches/" + match_id;
 

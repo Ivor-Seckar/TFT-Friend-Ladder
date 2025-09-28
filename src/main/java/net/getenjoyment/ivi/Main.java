@@ -2,8 +2,6 @@ package net.getenjoyment.ivi;
 
 import com.google.gson.Gson;
 
-import java.util.Arrays;
-
 public class Main {
     public static void main (String[] args) throws Exception {
 
@@ -44,9 +42,9 @@ public class Main {
         System.out.println("Average placement: " + Math.round(statiMojegaIgralca.getPlacement() * 100f) / 100f); //pomnožimo s 100, potem zaokrožimo na najbližje celo stevilo in potem spet delimo s 100. 3.1432424 --> 314.32424 --> 314 --> 3.14
         System.out.println("Average players eliminated: " + statiMojegaIgralca.getPlayers_eliminated());
         System.out.println(statiMojegaIgralca.returnFavourite_trait());
-        System.out.println("Favourite unit: " + statiMojegaIgralca.getFavourite_unit() + "\nThat unit was played: \033[1m" + statiMojegaIgralca.getFavourite_unit_times_played() + "\033[0m times in " + statiMojegaIgralca.getMatchHistoryMojegaIgralca().length + "\sgames.");
+        System.out.println("Favourite unit: " + statiMojegaIgralca.getFavourite_unit() + "\nThat unit was played: \033[1m" + statiMojegaIgralca.getFavourite_unit_times_played() + "\033[0m times in " + statiMojegaIgralca.getMatchHistoryMojegaIgralca().size() + "\sgames.");
 
-        TFT_Match zadnjaIgraMojegaIgralca = statiMojegaIgralca.getMatchHistoryMojegaIgralca()[0];   // 0 = latest igra, zadnji element v arrayu = najstarejsa igra
+        TFT_Match zadnjaIgraMojegaIgralca = statiMojegaIgralca.getMatchHistoryMojegaIgralca().getFirst();  // 0 = latest igra, zadnji element v arrayu = najstarejsa igra
 //        zadnjaIgraMojegaIgralca.getInfo().izpisiParticipants();
 //        System.out.println(zadnjaIgraMojegaIgralca.getInfo().getGame_length());
         System.out.println("Game type: " + zadnjaIgraMojegaIgralca.getInfo().getTft_game_type());
