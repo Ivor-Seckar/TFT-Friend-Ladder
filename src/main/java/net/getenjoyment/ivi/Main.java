@@ -6,8 +6,8 @@ public class Main {
     public static void main (String[] args) throws Exception {
 
         //povemo gameName in tagLine da dobimo nazaj puuid
-//        Summoner mojSummoner = new Summoner("I let her go bro", "BURAZ");
-        Summoner mojSummoner = new Summoner("relearn", "9999");
+        Summoner mojSummoner = new Summoner("I let her go bro", "BURAZ");
+//        Summoner mojSummoner = new Summoner("relearn", "9999");
 //        Summoner mojSummoner = new Summoner("marjanca", "weša");
 
         //naredimo dejanski API call in pridobimo nazaj puuid

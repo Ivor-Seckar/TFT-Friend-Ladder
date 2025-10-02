@@ -1,6 +1,5 @@
 package net.getenjoyment.ivi;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,7 +85,7 @@ public class SummonerStats {
     }
 
     // additional methods
-    public void setSummonerMatchHistory(int setNumber) {
+    public void setSummonerMatchHistory(int setNumber, Integer gameCount) {
         ArrayList<TFT_Match> matchHistoryMojegaIgralca = new ArrayList<>();
 
         int start = 0;
@@ -103,6 +102,8 @@ public class SummonerStats {
                     continue;
                 }
 
+                int processedMatches = 0;
+
                 for (int i = 0; i < matchHistoryMojegaIgralcaVStringu.length; i++) {
                     TFT_Match dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
                     int failCount = 0;
@@ -118,18 +119,19 @@ public class SummonerStats {
                         continue;
                     }
 
-                    if (dejanskaIgra.getInfo().getTft_set_number() != setNumber) {
+                    if (dejanskaIgra.getInfo().getTft_set_number() != setNumber || (gameCount != null && matchHistoryMojegaIgralca.size() >= gameCount)) {
                         continueFetching = false;
                         break;
                     }
                     matchHistoryMojegaIgralca.add(dejanskaIgra);
+                    processedMatches++;
 
                     if (i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
                         System.out.println("...Pausing 2 minutes to respect API rate limits...");
                         Thread.sleep(120_000);
                     }
                 }
-                start += matchHistoryMojegaIgralcaVStringu.length;
+                start += processedMatches;
 
             } catch (Exception e) {
                 System.out.println("Rate limit hit. Waiting 2 minutes before retrying...");
@@ -143,6 +145,10 @@ public class SummonerStats {
         }
 
         this.matchHistoryMojegaIgralca = matchHistoryMojegaIgralca;
+    }
+
+    public void setSummonerMatchHistory(int setNumber) {
+        setSummonerMatchHistory(setNumber, null);
     }
 
     public void setWinrate () {
@@ -371,8 +377,6 @@ public class SummonerStats {
         }
     }
 // TODO: separate double up, normal and ranked.
-
-// TODO: paginate match history and limit api calls so it doesn't exceed the rate
 
 //    public void progress
 
