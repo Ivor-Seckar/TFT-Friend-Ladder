@@ -52,6 +52,8 @@ public class Main {
 //        System.out.println(zadnjaIgraMojegaIgralca.getInfo().getGameCreation());
 
     }
+
+    // TODO: make a method which decides which queue to get the stats for and get them all at once
 }
 
 

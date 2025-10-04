@@ -158,7 +158,7 @@ public class SummonerStats {
                     matchHistory.add(dejanskaIgra);
                     processedMatches++;
 
-                    if (i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
+                    if (i > 0 && i % 85 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
                         System.out.println("...Pausing 2 minutes to respect API rate limits...");
                         Thread.sleep(120_000);
                     }
