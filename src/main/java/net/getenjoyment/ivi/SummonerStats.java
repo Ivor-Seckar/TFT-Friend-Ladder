@@ -6,7 +6,10 @@ import java.util.Map;
 
 public class SummonerStats {
     private Summoner igralec;
-    private ArrayList<TFT_Match> matchHistoryMojegaIgralca;
+    private ArrayList<TFT_Match> matchHistory;
+    private ArrayList<TFT_Match> normalMatchHistory;
+    private ArrayList<TFT_Match> rankedMatchHistory;
+    private ArrayList<TFT_Match> doubleUpMatchHistory;
     private double winrate;
     private int gold_left;
     private double last_round;
@@ -32,8 +35,8 @@ public class SummonerStats {
         this.igralec = igralec;
     }
 
-    public ArrayList<TFT_Match> getMatchHistoryMojegaIgralca() {
-        return matchHistoryMojegaIgralca;
+    public ArrayList<TFT_Match> getMatchHistory() {
+        return matchHistory;
     }
 
     public double getWinrate() {
@@ -84,46 +87,74 @@ public class SummonerStats {
         return favourite_silver_plus_trait_times_played;
     }
 
+    public ArrayList<TFT_Match> getNormalMatchHistory() {
+        return normalMatchHistory;
+    }
+
+    public ArrayList<TFT_Match> getRankedMatchHistory() {
+        return rankedMatchHistory;
+    }
+
+    public ArrayList<TFT_Match> getDoubleUpMatchHistory() {
+        return doubleUpMatchHistory;
+    }
+
     // additional methods
     public void setSummonerMatchHistory(int setNumber, Integer gameCount) {
-        ArrayList<TFT_Match> matchHistoryMojegaIgralca = new ArrayList<>();
+        ArrayList<TFT_Match> matchHistory = new ArrayList<>();
+        ArrayList<TFT_Match> normalMatchHistory = new ArrayList<>();
+        ArrayList<TFT_Match> rankedMatchHistory = new ArrayList<>();
+        ArrayList<TFT_Match> doubleUpMatchHistory = new ArrayList<>();
 
         int start = 0;
         boolean continueFetching = true;
 
         while(continueFetching) {
-            String[] matchHistoryMojegaIgralcaVStringu = null;
+            String[] matchHistoryVStringu = null;
 
             try {
-                matchHistoryMojegaIgralcaVStringu = API_Calls.getMatchHistory(igralec, 100, start);
+                matchHistoryVStringu = API_Calls.getMatchHistory(igralec, 100, start);
 
-                if (matchHistoryMojegaIgralcaVStringu.length == 0) {  // Could be end of history or temporary API empty response
+                if (matchHistoryVStringu.length == 0) {  // Could be end of history or temporary API empty response
                     Thread.sleep(10_000);
                     continue;
                 }
 
                 int processedMatches = 0;
 
-                for (int i = 0; i < matchHistoryMojegaIgralcaVStringu.length; i++) {
-                    TFT_Match dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
+                for (int i = 0; i < matchHistoryVStringu.length; i++) {
+                    TFT_Match dejanskaIgra = API_Calls.getMatchData(matchHistoryVStringu[i]);
                     int failCount = 0;
 
                     while ((dejanskaIgra == null || dejanskaIgra.getInfo() == null) && failCount < 6) {
-                        System.out.println("Retrying match " + matchHistoryMojegaIgralcaVStringu[i] + " because info is null.");
+                        System.out.println("Retrying match " + matchHistoryVStringu[i] + " because info is null.");
                         Thread.sleep(15_000);
-                        dejanskaIgra = API_Calls.getMatchData(matchHistoryMojegaIgralcaVStringu[i]);
+                        dejanskaIgra = API_Calls.getMatchData(matchHistoryVStringu[i]);
                         failCount++;
                     }
                     if (dejanskaIgra == null || dejanskaIgra.getInfo() == null){
-                        System.out.println("Skipping match " + matchHistoryMojegaIgralcaVStringu[i] + " because info is null.");
+                        System.out.println("Skipping match " + matchHistoryVStringu[i] + " because info is null.");
                         continue;
                     }
 
-                    if (dejanskaIgra.getInfo().getTft_set_number() != setNumber || (gameCount != null && matchHistoryMojegaIgralca.size() >= gameCount)) {
+                    if (dejanskaIgra.getInfo().getTft_set_number() != setNumber || (gameCount != null && matchHistory.size() >= gameCount)) {
                         continueFetching = false;
                         break;
                     }
-                    matchHistoryMojegaIgralca.add(dejanskaIgra);
+
+                    int queueId = dejanskaIgra.getInfo().getQueue_id();
+
+                    if (queueId == 1100) { // ranked
+                        rankedMatchHistory.add(dejanskaIgra);
+                    } else if (queueId == 1090) { // normal
+                        normalMatchHistory.add(dejanskaIgra);
+                    } else if (queueId == 1160) { // double up
+                        doubleUpMatchHistory.add(dejanskaIgra);
+                    } else {
+                        System.out.println("Unknown queue: " + queueId + " for game " + matchHistoryVStringu[i]);
+                    }
+
+                    matchHistory.add(dejanskaIgra);
                     processedMatches++;
 
                     if (i > 0 && i % 90 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
@@ -144,7 +175,10 @@ public class SummonerStats {
             }
         }
 
-        this.matchHistoryMojegaIgralca = matchHistoryMojegaIgralca;
+        this.matchHistory = matchHistory;
+        this.normalMatchHistory = normalMatchHistory;
+        this.rankedMatchHistory = rankedMatchHistory;
+        this.doubleUpMatchHistory = doubleUpMatchHistory;
     }
 
     public void setSummonerMatchHistory(int setNumber) {
@@ -154,7 +188,7 @@ public class SummonerStats {
     public void setWinrate () {
         int winCount = 0;
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             String[] playerPuuids = igra.getMetadata().getParticipants();
             for (int i = 0; i < playerPuuids.length; i++) {
@@ -165,15 +199,15 @@ public class SummonerStats {
         }
 
         System.out.println(winCount);
-        System.out.println(matchHistoryMojegaIgralca.size());
+        System.out.println(matchHistory.size());
 
-        this.winrate = (double) winCount / matchHistoryMojegaIgralca.size();
+        this.winrate = (double) winCount / matchHistory.size();
     }
 
     public void setGold_left () {
         int goldLeft = 0;
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             String[] playerPuuids = igra.getMetadata().getParticipants();
             for (int i = 0; i < playerPuuids.length; i++) {
@@ -183,13 +217,13 @@ public class SummonerStats {
                 }
             }
         }
-        this.gold_left = (int) Math.round((double)goldLeft/ matchHistoryMojegaIgralca.size());
+        this.gold_left = (int) Math.round((double)goldLeft/ matchHistory.size());
     }
 
     public void setAverageLast_Round () {
         double LastRoundTotal = 0;
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             String[] playerPuuids = igra.getMetadata().getParticipants();
             for (int i = 0; i < playerPuuids.length; i++) {
@@ -199,7 +233,7 @@ public class SummonerStats {
                 }
             }
         }
-        this.last_round = LastRoundTotal/ matchHistoryMojegaIgralca.size();
+        this.last_round = LastRoundTotal/ matchHistory.size();
     }
 
     public String returnLastRound() {
@@ -227,7 +261,7 @@ public class SummonerStats {
     public void setAverageTotal_damage_to_players () {
         int totalDamage = 0;
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             String[] playerPuuids = igra.getMetadata().getParticipants();
             for (int i = 0; i < playerPuuids.length; i++) {
@@ -237,13 +271,13 @@ public class SummonerStats {
                 }
             }
         }
-        this.total_damage_to_players = (int) Math.round((double)totalDamage/ matchHistoryMojegaIgralca.size());
+        this.total_damage_to_players = (int) Math.round((double)totalDamage/ matchHistory.size());
     }
 
     public void setAveragePlacement () {
         float totalPlacement = 0;
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             String[] playerPuuids = igra.getMetadata().getParticipants();
             for (int i = 0; i < playerPuuids.length; i++) {
@@ -253,13 +287,13 @@ public class SummonerStats {
                 }
             }
         }
-        this.placement = totalPlacement / matchHistoryMojegaIgralca.size();
+        this.placement = totalPlacement / matchHistory.size();
     }
 
     public void setAveragePlayersEliminated () {
         int totalEliminations = 0;
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             String[] playerPuuids = igra.getMetadata().getParticipants();
             for (int i = 0; i < playerPuuids.length; i++) {
@@ -269,13 +303,13 @@ public class SummonerStats {
                 }
             }
         }
-        this.players_eliminated = totalEliminations / matchHistoryMojegaIgralca.size();
+        this.players_eliminated = totalEliminations / matchHistory.size();
     }
 
     public void setFavourite_trait() {
         HashMap<String, Integer> mojiTraiti = new HashMap<>();
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             MatchParticipant[] mojiIgralci = igra.getInfo().getParticipants();
             for(MatchParticipant participant : mojiIgralci) {
@@ -333,16 +367,16 @@ public class SummonerStats {
     public String returnFavourite_trait() {
         return "Favourite trait: " + favourite_trait
                 + "\nThat trait was played \033[1m" + favourite_trait_times_played
-                + "\033[0m times in " + matchHistoryMojegaIgralca.size() + "\sgames."
+                + "\033[0m times in " + matchHistory.size() + "\sgames."
                 + "\nFavourite trait (silver plus): " + favourite_silver_plus_trait
                 + "\nThat trait was played \033[1m" + favourite_silver_plus_trait_times_played
-                + "\033[0m times in " + matchHistoryMojegaIgralca.size() + "\sgames.";
+                + "\033[0m times in " + matchHistory.size() + "\sgames.";
     }
 
     public void setFavourite_unit() {
         HashMap<String, Integer> mojiUniti = new HashMap<>();
 
-        for(TFT_Match igra : matchHistoryMojegaIgralca) {
+        for(TFT_Match igra : matchHistory) {
 
             MatchParticipant[] mojiIgralci = igra.getInfo().getParticipants();
             for(MatchParticipant participant : mojiIgralci) {
