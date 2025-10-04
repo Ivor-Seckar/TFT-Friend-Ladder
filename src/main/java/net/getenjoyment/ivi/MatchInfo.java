@@ -9,7 +9,7 @@ public class MatchInfo {
     private String game_version; // which patch and when it was deployed
     private int mapId; // Convergence - the TFT map, others are LOL
     private MatchParticipant[] participants;
-    private int queue_id;  // 1090 - TFT games, 1100 - Ranked TFT games, 1110 - TFT tutorial games, 1111 - TFT test games, 1150 (before set 7) & 1160 (after set 7) - Double up  1210 - Choncc
+    private int queue_id;  // 1090 - TFT games, 1100 - Ranked TFT games, 1110 - TFT tutorial games, 1111 - TFT test games, 1150 (before set 7) & 1160 (after set 7) - Double up  1210 - Choncc, 1220 - Tocker's trial
     private String tft_game_type; // standard, pairs, ...
     private String tft_set_core_name;
     private int tft_set_number;
