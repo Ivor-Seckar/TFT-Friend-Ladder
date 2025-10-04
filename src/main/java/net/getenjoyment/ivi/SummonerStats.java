@@ -152,6 +152,7 @@ public class SummonerStats {
                         doubleUpMatchHistory.add(dejanskaIgra);
                     } else {
                         System.out.println("Unknown queue: " + queueId + " for game " + matchHistoryVStringu[i]);
+                        continue;
                     }
 
                     matchHistory.add(dejanskaIgra);
