@@ -3,7 +3,7 @@ package net.getenjoyment.ivi;
 import com.google.gson.Gson;
 
 public class Main {
-    public static void main (String[] args) throws Exception {
+    public static void main (String[] args) {
 
         //povemo gameName in tagLine da dobimo nazaj puuid
 //        Summoner mojSummoner = new Summoner("I let her go bro", "BURAZ");
@@ -36,8 +36,6 @@ public class Main {
 //        System.out.println(zadnjaIgraMojegaIgralca.getInfo().getGameCreation());
 
     }
-
-    // TODO: make a method which decides which queue to get the stats for and get them all at once
 }
 
 

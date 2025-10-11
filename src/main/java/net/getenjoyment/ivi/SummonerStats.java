@@ -412,6 +412,10 @@ public class SummonerStats {
         }
     }
 
+//    public void progress (ArrayList<TFT_Match> myGames) {
+//
+//    }
+
     public void setAndPrintEveryStat(String queue) { // all, normal, ranked, doubleUp
         ArrayList<TFT_Match> myGames;
 
@@ -443,7 +447,5 @@ public class SummonerStats {
         System.out.println(this.returnFavourite_trait(myGames));
         System.out.println("Favourite unit: " + this.getFavourite_unit() + "\nThat unit was played: \033[1m" + this.getFavourite_unit_times_played() + "\033[0m times in " + myGames.size() + "\sgames.");
     }
-
-//    public void progress
 
 }
