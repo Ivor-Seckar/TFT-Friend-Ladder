@@ -2,6 +2,7 @@ package net.getenjoyment.ivi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SummonerStats {
@@ -413,7 +414,13 @@ public class SummonerStats {
     }
 
 //    public void progress (ArrayList<TFT_Match> myGames) {
+//        ArrayList<TFT_Match> progressList = new ArrayList<>();
 //
+//        if(myGames.size() >= 20) {
+//            progressList = (ArrayList<TFT_Match>) myGames.subList(0, 20);  // BE CAREFUL - sublists are connected to the main list and any changes will affect that main list too.
+//        } else {
+//            System.out.println("There isn’t sufficient recent match data to accurately assess progress.");
+//        }
 //    }
 
     public void setAndPrintEveryStat(String queue) { // all, normal, ranked, doubleUp
