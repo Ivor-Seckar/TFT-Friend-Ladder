@@ -1,5 +1,6 @@
 package net.getenjoyment.ivi;
 
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -413,7 +414,12 @@ public class SummonerStats {
         }
     }
 
-//    public void progress (ArrayList<TFT_Match> myGames) {
+//    public void setProgress(ArrayList<TFT_Match> myGames) {
+//        if(this.winrate == 0 || this.favourite_unit == null) {
+//            System.out.println("Cannot calculate progress due to missing data.");
+//            return;
+//        }
+//
 //        ArrayList<TFT_Match> progressList = new ArrayList<>();
 //
 //        if(myGames.size() >= 20) {
@@ -421,6 +427,8 @@ public class SummonerStats {
 //        } else {
 //            System.out.println("There isn’t sufficient recent match data to accurately assess progress.");
 //        }
+//
+//
 //    }
 
     public void setAndPrintEveryStat(String queue) { // all, normal, ranked, doubleUp
