@@ -1,9 +1,7 @@
 package net.getenjoyment.ivi;
 
-import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class SummonerStats {
@@ -136,6 +134,7 @@ public class SummonerStats {
                     }
                     if (dejanskaIgra == null || dejanskaIgra.getInfo() == null){
                         System.out.println("Skipping match " + matchHistoryVStringu[i] + " because info is null.");
+                        processedMatches++;
                         continue;
                     }
 
@@ -146,18 +145,27 @@ public class SummonerStats {
 
                     int queueId = dejanskaIgra.getInfo().getQueue_id();
 
-                    if (queueId == 1100) { // ranked
-                        rankedMatchHistory.add(dejanskaIgra);
-                    } else if (queueId == 1090) { // normal
-                        normalMatchHistory.add(dejanskaIgra);
-                    } else if (queueId == 1160) { // double up
-                        doubleUpMatchHistory.add(dejanskaIgra);
-                    } else {
-                        System.out.println("Unknown queue: " + queueId + " for game " + matchHistoryVStringu[i]);
-                        continue;
+                    switch (queueId) {
+                        case 1100 -> { // ranked
+                            rankedMatchHistory.add(dejanskaIgra);
+                            matchHistory.add(dejanskaIgra);
+                        }
+                        case 1090 -> { // normal
+                            normalMatchHistory.add(dejanskaIgra);
+                            matchHistory.add(dejanskaIgra);
+                        }
+                        case 1160 -> { // double up
+                            doubleUpMatchHistory.add(dejanskaIgra);
+                            matchHistory.add(dejanskaIgra);
+                        }
+                        case 6130 -> { // ao shin's ascent
+                        // empty so it gets skipped
+                        }
+                        default -> {
+                            System.out.println("Unknown queue: " + queueId + " for game " + matchHistoryVStringu[i]);
+                        }
                     }
 
-                    matchHistory.add(dejanskaIgra);
                     processedMatches++;
 
                     if (i > 0 && i % 85 == 0) {  // when i is divisible by 90, sleep for 2 minutes. (so that i don't exceed the API rate limits - 20 requests/second or 100 requests/2 minutes)
@@ -188,7 +196,8 @@ public class SummonerStats {
         setSummonerMatchHistory(setNumber, null);
     }
 
-    public void setWinrate (ArrayList<TFT_Match> myGames) {
+
+    public double calculateWinrate(ArrayList<TFT_Match> myGames) {
         int winCount = 0;
 
         for(TFT_Match igra : myGames) {
@@ -204,10 +213,15 @@ public class SummonerStats {
         System.out.println(winCount);
         System.out.println(myGames.size());
 
-        this.winrate = (double) winCount / myGames.size();
+        return (double) winCount / myGames.size();
     }
 
-    public void setGold_left (ArrayList<TFT_Match> myGames) {
+    public void setWinrate(ArrayList<TFT_Match> myGames) {
+        this.winrate = calculateWinrate(myGames);
+    }
+
+
+    public int calculateGold_left(ArrayList<TFT_Match> myGames) {
         int goldLeft = 0;
 
         for(TFT_Match igra : myGames) {
@@ -220,10 +234,15 @@ public class SummonerStats {
                 }
             }
         }
-        this.gold_left = (int) Math.round((double)goldLeft/ myGames.size());
+        return (int) Math.round((double)goldLeft/ myGames.size());
     }
 
-    public void setAverageLast_Round (ArrayList<TFT_Match> myGames) {
+    public void setGold_left(ArrayList<TFT_Match> myGames) {
+        this.gold_left = calculateGold_left(myGames);
+    }
+
+
+    public double calculateAverageLast_Round(ArrayList<TFT_Match> myGames) {
         double LastRoundTotal = 0;
 
         for(TFT_Match igra : myGames) {
@@ -236,10 +255,14 @@ public class SummonerStats {
                 }
             }
         }
-        this.last_round = LastRoundTotal/ myGames.size();
+        return LastRoundTotal/ myGames.size();
     }
 
-    public String returnLastRound() {
+    public void setAverageLast_Round(ArrayList<TFT_Match> myGames) {
+        this.last_round = calculateAverageLast_Round(myGames);
+    }
+
+    public String returnLast_Round() {
         int avgRound = (int) Math.floor(last_round); // math.floor for it to round down, Math.round for it to round accurately (even if upwards)
         int stage, round;
 
@@ -261,7 +284,8 @@ public class SummonerStats {
                 + ", Round: " + round;
     }
 
-    public void setAverageTotal_damage_to_players (ArrayList<TFT_Match> myGames) {
+
+    public int calculateAverageTotal_damage_to_players(ArrayList<TFT_Match> myGames) {
         int totalDamage = 0;
 
         for(TFT_Match igra : myGames) {
@@ -274,11 +298,16 @@ public class SummonerStats {
                 }
             }
         }
-        this.total_damage_to_players = (int) Math.round((double)totalDamage/ myGames.size());
+        return (int) Math.round((double)totalDamage/ myGames.size());
     }
 
-    public void setAveragePlacement (ArrayList<TFT_Match> myGames) {
-        float totalPlacement = 0;
+    public void setAverageTotal_damage_to_players(ArrayList<TFT_Match> myGames) {
+        this.total_damage_to_players = calculateAverageTotal_damage_to_players(myGames);
+    }
+
+
+    public double calculateAveragePlacement(ArrayList<TFT_Match> myGames) {
+        double totalPlacement = 0;
 
         for(TFT_Match igra : myGames) {
 
@@ -290,10 +319,15 @@ public class SummonerStats {
                 }
             }
         }
-        this.placement = totalPlacement / myGames.size();
+        return totalPlacement / myGames.size();
     }
 
-    public void setAveragePlayersEliminated (ArrayList<TFT_Match> myGames) {
+    public void setAveragePlacement(ArrayList<TFT_Match> myGames) {
+        this.placement = calculateAveragePlacement(myGames);
+    }
+
+
+    public int calculateAveragePlayersEliminated(ArrayList<TFT_Match> myGames) {
         int totalEliminations = 0;
 
         for(TFT_Match igra : myGames) {
@@ -306,8 +340,13 @@ public class SummonerStats {
                 }
             }
         }
-        this.players_eliminated = totalEliminations / myGames.size();
+        return totalEliminations / myGames.size();
     }
+
+    public void setAveragePlayersEliminated(ArrayList<TFT_Match> myGames) {
+        this.players_eliminated = calculateAveragePlayersEliminated(myGames);
+    }
+
 
     public void setFavourite_trait(ArrayList<TFT_Match> myGames) {
         HashMap<String, Integer> mojiTraiti = new HashMap<>();
@@ -376,6 +415,7 @@ public class SummonerStats {
                 + "\033[0m times in " + myGames.size() + "\sgames.";
     }
 
+
     public void setFavourite_unit(ArrayList<TFT_Match> myGames) {
         HashMap<String, Integer> mojiUniti = new HashMap<>();
 
@@ -414,22 +454,25 @@ public class SummonerStats {
         }
     }
 
-//    public void setProgress(ArrayList<TFT_Match> myGames) {
-//        if(this.winrate == 0 || this.favourite_unit == null) {
-//            System.out.println("Cannot calculate progress due to missing data.");
-//            return;
-//        }
-//
-//        ArrayList<TFT_Match> progressList = new ArrayList<>();
-//
-//        if(myGames.size() >= 20) {
-//            progressList = (ArrayList<TFT_Match>) myGames.subList(0, 20);  // BE CAREFUL - sublists are connected to the main list and any changes will affect that main list too.
-//        } else {
-//            System.out.println("There isn’t sufficient recent match data to accurately assess progress.");
-//        }
-//
-//
-//    }
+
+    public void setProgress(ArrayList<TFT_Match> myGames) {
+        if(this.winrate == 0 || this.favourite_unit == null) {  // checking just the first and last attribute if they're null
+            System.out.println("Cannot calculate progress due to missing data.");
+            return;
+        }
+
+        ArrayList<TFT_Match> progressList = new ArrayList<>();
+
+        if(myGames.size() >= 20) {
+            progressList = (ArrayList<TFT_Match>) myGames.subList(0, 20);  // BE CAREFUL - sublists are connected to the main list and any changes will affect that main list too.
+        } else {
+            System.out.println("There isn’t sufficient recent match data to accurately assess progress.");
+            return;
+        }
+
+
+    }
+
 
     public void setAndPrintEveryStat(String queue) { // all, normal, ranked, doubleUp
         ArrayList<TFT_Match> myGames;
@@ -441,21 +484,21 @@ public class SummonerStats {
             case "doubleUp" -> myGames = this.doubleUpMatchHistory;
             default -> throw new IllegalArgumentException("Invalid queue type entry.");
         }
-        this.setWinrate(myGames);
-        this.setGold_left(myGames);
-        this.setAverageLast_Round(myGames);
-        this.setAverageTotal_damage_to_players(myGames);
-        this.setAveragePlacement(myGames);
-        this.setAveragePlayersEliminated(myGames);
-        this.setFavourite_trait(myGames);
-        this.setFavourite_unit(myGames);
+        setWinrate(myGames);
+        setGold_left(myGames);
+        setAverageLast_Round(myGames);
+        setAverageTotal_damage_to_players(myGames);
+        setAveragePlacement(myGames);
+        setAveragePlayersEliminated(myGames);
+        setFavourite_trait(myGames);
+        setFavourite_unit(myGames);
 
         System.out.println("Successfully calculated all stats for " + queue + " queue.");
 
 
         System.out.println("Top 4 rate: " + this.getWinrate()*100 + "%");
         System.out.println("Average gold left: " + this.getGold_left());
-        System.out.println(this.returnLastRound());
+        System.out.println(this.returnLast_Round());
         System.out.println("Average total damage to players: " + this.getTotal_damage_to_players());
         System.out.println("Average placement: " + Math.round(this.getPlacement() * 100f) / 100f); //pomnožimo s 100, potem zaokrožimo na najbližje celo stevilo in potem spet delimo s 100. 3.1432424 --> 314.32424 --> 314 --> 3.14
         System.out.println("Average players eliminated: " + this.getPlayers_eliminated());
