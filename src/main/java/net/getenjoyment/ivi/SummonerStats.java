@@ -454,7 +454,7 @@ public class SummonerStats {
         }
     }
 
-
+// TODO: finish this
     public void setProgress(ArrayList<TFT_Match> myGames) {
         if(this.winrate == 0 || this.favourite_unit == null) {  // checking just the first and last attribute if they're null
             System.out.println("Cannot calculate progress due to missing data.");
