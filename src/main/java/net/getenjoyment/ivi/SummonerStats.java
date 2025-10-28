@@ -454,7 +454,7 @@ public class SummonerStats {
         }
     }
 
-// TODO: finish this
+// TODO: finish this - probs save the results into a list and make another method to print it
     public void setProgress(ArrayList<TFT_Match> myGames) {
         if(this.winrate == 0 || this.favourite_unit == null) {  // checking just the first and last attribute if they're null
             System.out.println("Cannot calculate progress due to missing data.");
@@ -470,6 +470,12 @@ public class SummonerStats {
             return;
         }
 
+        double newWinrate = calculateWinrate(myGames);
+        int newGold_left = calculateGold_left(myGames);
+        double newAverageLast_Round = calculateAverageLast_Round(myGames);
+        int newAverageTotal_damage_to_players = calculateAverageTotal_damage_to_players(myGames);
+        double newAveragePlacement = calculateAveragePlacement(myGames);
+        int newAveragePlayersEliminated = calculateAveragePlayersEliminated(myGames);
 
     }
 
