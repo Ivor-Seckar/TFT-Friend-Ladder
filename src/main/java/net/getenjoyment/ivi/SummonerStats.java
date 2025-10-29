@@ -1,8 +1,6 @@
 package net.getenjoyment.ivi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SummonerStats {
     private Summoner igralec;
@@ -455,10 +453,10 @@ public class SummonerStats {
     }
 
 // TODO: finish this - probs save the results into a list and make another method to print it
-    public void setProgress(ArrayList<TFT_Match> myGames) {
+    public Map<String, Double> setProgress(ArrayList<TFT_Match> myGames) {
         if(this.winrate == 0 || this.favourite_unit == null) {  // checking just the first and last attribute if they're null
             System.out.println("Cannot calculate progress due to missing data.");
-            return;
+            return Collections.emptyMap(); // returns an empty, immutable map (and doesn't actually create a new one)
         }
 
         ArrayList<TFT_Match> progressList = new ArrayList<>();
@@ -466,8 +464,8 @@ public class SummonerStats {
         if(myGames.size() >= 20) {
             progressList = (ArrayList<TFT_Match>) myGames.subList(0, 20);  // BE CAREFUL - sublists are connected to the main list and any changes will affect that main list too.
         } else {
-            System.out.println("There isn’t sufficient recent match data to accurately assess progress.");
-            return;
+            System.out.println("There isn’t sufficient match data to accurately assess progress.");
+            return Collections.emptyMap();
         }
 
         double newWinrate = calculateWinrate(myGames);
@@ -477,6 +475,22 @@ public class SummonerStats {
         double newAveragePlacement = calculateAveragePlacement(myGames);
         int newAveragePlayersEliminated = calculateAveragePlayersEliminated(myGames);
 
+        HashMap<String, Double> progress = new HashMap<>();
+
+        double winrateProgress = ((newWinrate - this.winrate) / this.winrate) * 100;
+        progress.put("winrate", winrateProgress);
+        double gold_leftProgress = ((double) (newGold_left - this.gold_left) / this.gold_left) * 100;
+        progress.put("goldLeft", gold_leftProgress);
+        double last_RoundProgress = ((newAverageLast_Round - this.last_round) / this.last_round) * 100;
+        progress.put("lastRound", last_RoundProgress);
+        double dmgProgress = ((double) (newAverageTotal_damage_to_players - this.total_damage_to_players) / this.total_damage_to_players) * 100;
+        progress.put("dmg", dmgProgress);
+        double placementProgress = ((newAveragePlacement - this.placement) / this.placement) * 100;
+        progress.put("placement", placementProgress);
+        double playersEliminatedProgress = ((double) (newAveragePlayersEliminated - this.players_eliminated) / this.players_eliminated) * 100;
+        progress.put("playersEliminated", playersEliminatedProgress);
+
+        return progress;
     }
 
 
