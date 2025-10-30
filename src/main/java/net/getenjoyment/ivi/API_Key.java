@@ -2,8 +2,8 @@ package net.getenjoyment.ivi;
 
 public class API_Key {
 
-    //v edit run configuration ali v cmd(potem tudi pozenemo v cmd) moramo nastimati local variable:
-    //set RIOT_API_KEY=(moj dejanski api key)
+    // v edit run configuration ali v cmd(potem tudi pozenemo v cmd) moramo nastimati local variable:
+    // set RIOT_API_KEY=(moj dejanski api key)
     private static final String apiKey = System.getenv("RIOT_API_KEY");
 
     public static String getApiKey() {
