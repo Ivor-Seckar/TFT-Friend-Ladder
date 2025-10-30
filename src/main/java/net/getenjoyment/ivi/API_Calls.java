@@ -30,7 +30,7 @@ public class API_Calls {
                 // Objasnimo, da se gre za get in ne post / put / delete
                 .GET()
 
-                // zbuildamo?
+                // zbuildamo
                 .build();
 
         // Odpremo nov http klient (predstavljaj si kaksen web extension ki poslje api call)

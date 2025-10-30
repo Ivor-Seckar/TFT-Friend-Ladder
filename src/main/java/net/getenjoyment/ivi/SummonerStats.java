@@ -136,6 +136,13 @@ public class SummonerStats {
                         continue;
                     }
 
+                    // temporary solution - skipping set revival matches so they don't break the entire loop
+                    if(dejanskaIgra.getInfo().getTft_set_number() == 7) {
+                        System.out.println("Skipping match " + matchHistoryVStringu[i] + " because it's a set revival match.");
+                        processedMatches++;
+                        continue;
+                    }
+
                     if (dejanskaIgra.getInfo().getTft_set_number() != setNumber || (gameCount != null && matchHistory.size() >= gameCount)) {
                         continueFetching = false;
                         break;
@@ -459,21 +466,21 @@ public class SummonerStats {
             return Collections.emptyMap(); // returns an empty, immutable map (and doesn't actually create a new one)
         }
 
-        ArrayList<TFT_Match> progressList = new ArrayList<>();
+        ArrayList<TFT_Match> progressList;
 
         if(myGames.size() >= 20) {
-            progressList = (ArrayList<TFT_Match>) myGames.subList(0, 20);  // BE CAREFUL - sublists are connected to the main list and any changes will affect that main list too.
+            progressList = new ArrayList<>(myGames.subList(0, 20));  // BE CAREFUL - sublists are connected to the main list and any changes will affect that main list too.
         } else {
             System.out.println("There isn’t sufficient match data to accurately assess progress.");
             return Collections.emptyMap();
         }
 
-        double newWinrate = calculateWinrate(myGames);
-        int newGold_left = calculateGold_left(myGames);
-        double newAverageLast_Round = calculateAverageLast_Round(myGames);
-        int newAverageTotal_damage_to_players = calculateAverageTotal_damage_to_players(myGames);
-        double newAveragePlacement = calculateAveragePlacement(myGames);
-        int newAveragePlayersEliminated = calculateAveragePlayersEliminated(myGames);
+        double newWinrate = calculateWinrate(progressList);
+        int newGold_left = calculateGold_left(progressList);
+        double newAverageLast_Round = calculateAverageLast_Round(progressList);
+        int newAverageTotal_damage_to_players = calculateAverageTotal_damage_to_players(progressList);
+        double newAveragePlacement = calculateAveragePlacement(progressList);
+        int newAveragePlayersEliminated = calculateAveragePlayersEliminated(progressList);
 
         HashMap<String, Double> progress = new HashMap<>();
 
@@ -491,6 +498,17 @@ public class SummonerStats {
         progress.put("playersEliminated", playersEliminatedProgress);
 
         return progress;
+    }
+
+    public void printProgress(Map<String, Double> myMap) {
+        if(myMap.isEmpty()) {
+            System.out.println("Missing match data when trying to display progress.");
+            return;
+        }
+
+        for(Map.Entry<String, Double> element : myMap.entrySet()) {
+            System.out.println(element.getKey() + " change: " + element.getValue() + "%");
+        }
     }
 
 
@@ -513,6 +531,7 @@ public class SummonerStats {
         setFavourite_trait(myGames);
         setFavourite_unit(myGames);
 
+
         System.out.println("Successfully calculated all stats for " + queue + " queue.");
 
 
@@ -524,6 +543,8 @@ public class SummonerStats {
         System.out.println("Average players eliminated: " + this.getPlayers_eliminated());
         System.out.println(this.returnFavourite_trait(myGames));
         System.out.println("Favourite unit: " + this.getFavourite_unit() + "\nThat unit was played: \033[1m" + this.getFavourite_unit_times_played() + "\033[0m times in " + myGames.size() + "\sgames.");
+
+        printProgress(setProgress(myGames)); // has to be the last line (out of all the set stats)
     }
 
 }
